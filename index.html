@@ -3,53 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการเรียนการสอน</title>
+    <title>ระบบจัดการเรียนการสอนแบบครบวงจร</title>
     <!-- Supabase & PeerJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f7fe; color: #333; }
+        body { background-color: #f4f7fe; color: #2d3748; }
         
         /* LOGIN PAGE */
         .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .login-box { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); width: 100%; max-width: 400px; text-align: center; }
-        .login-box h2 { margin-bottom: 1.5rem; color: #4a5568; }
+        .login-box h2 { margin-bottom: 1.5rem; color: #2d3748; }
         .form-group { margin-bottom: 1.2rem; text-align: left; }
-        .form-group label { display: block; margin-bottom: 0.4rem; font-size: 0.9rem; color: #4a5568; }
-        .form-control { width: 100%; padding: 0.75rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; }
-        .btn { width: 100%; padding: 0.75rem; border: none; border-radius: 6px; background-color: #4c51bf; color: white; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-size: 0.9rem; color: #4a5568; font-weight: 600; }
+        .form-control { width: 100%; padding: 0.75rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.95rem; outline: none; transition: 0.2s; }
+        .form-control:focus { border-color: #4c51bf; box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2); }
+        .btn { width: 100%; padding: 0.75rem; border: none; border-radius: 6px; background-color: #4c51bf; color: white; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn:hover { background-color: #434190; }
+        .btn-success { background-color: #38a169; } .btn-success:hover { background-color: #2f855a; }
         .btn-danger { background-color: #e53e3e; } .btn-danger:hover { background-color: #c53030; }
         .btn-secondary { background-color: #718096; } .btn-secondary:hover { background-color: #4a5568; }
+        .btn-sm { width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem; }
 
         /* DASHBOARD LAYOUT */
         #systemPage { display: none; }
         .layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background-color: #1a202c; color: white; padding: 1.5rem 1rem; flex-shrink: 0; }
-        .sidebar h2 { font-size: 1.2rem; margin-bottom: 1.5rem; color: #a0aec0; text-align: center; }
-        .sidebar-user { text-align: center; padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #2d3748; font-weight: bold; }
-        .nav-menu { list-style: none; }
-        .nav-item { padding: 0.8rem 1rem; margin-bottom: 0.3rem; border-radius: 6px; cursor: pointer; color: #cbd5e0; transition: 0.2s; }
-        .nav-item:hover, .nav-item.active { background-color: #2d3748; color: white; }
-        .main-content { flex-grow: 1; padding: 2rem; overflow-y: auto; }
+        .sidebar { width: 260px; background-color: #1a202c; color: white; padding: 1.5rem 1rem; flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar h2 { font-size: 1.3rem; margin-bottom: 1.5rem; color: #63b3ed; text-align: center; font-weight: bold; }
+        .sidebar-user { text-align: center; padding: 0.8rem; margin-bottom: 1.5rem; background: #2d3748; border-radius: 8px; font-size: 0.95rem; }
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item { padding: 0.8rem 1rem; margin-bottom: 0.4rem; border-radius: 6px; cursor: pointer; color: #cbd5e0; transition: 0.2s; font-size: 0.95rem; }
+        .nav-item:hover, .nav-item.active { background-color: #4c51bf; color: white; font-weight: bold; }
+        .main-content { flex-grow: 1; padding: 2rem; overflow-y: auto; background-color: #f8fafc; }
 
         /* CARDS & TABLES */
-        .card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; }
         .page-section { display: none; }
         .page-section.active { display: block; }
-        .page-title { font-size: 1.5rem; margin-bottom: 1.5rem; color: #2d3748; }
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 1rem; }
-        th, td { padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0; }
-        th { background-color: #f7fafc; color: #4a5568; }
+        .page-title { font-size: 1.6rem; margin-bottom: 1.5rem; color: #1a202c; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .table-wrapper { overflow-x: auto; margin-top: 1rem; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 0.85rem 1rem; border-bottom: 1px solid #e2e8f0; font-size: 0.95rem; }
+        th { background-color: #edf2f7; color: #4a5568; font-weight: 600; }
         .empty { text-align: center; color: #a0aec0; padding: 2rem; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .badge { padding: 0.25rem 0.6rem; border-radius: 50px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
+        .badge-pending { background-color: #feebc8; color: #c05621; }
+        .badge-graded { background-color: #c6f6d5; color: #22543d; }
 
         /* VIDEO CALL */
         .video-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
-        video { width: 100%; height: 260px; background-color: #2d3748; border-radius: 8px; object-fit: cover; }
-        .video-controls { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        video { width: 100%; height: 280px; background-color: #1a202c; border-radius: 8px; object-fit: cover; }
+        .video-controls { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -57,9 +64,9 @@
 <!-- LOGIN PAGE -->
 <div id="loginPage" class="login-container">
     <div class="login-box">
-        <h2>เข้าสู่ระบบจัดการเรียนรู้</h2>
+        <h2>🎓 ระบบจัดการเรียนรู้</h2>
         <div class="form-group">
-            <label>สถานะผู้ใช้งาน</label>
+            <label>เลือกสถานะการใช้งาน</label>
             <select id="role" class="form-control">
                 <option value="student">นักเรียน (Student)</option>
                 <option value="teacher">คุณครู (Teacher)</option>
@@ -67,13 +74,13 @@
         </div>
         <div class="form-group">
             <label>อีเมล / รหัสนักเรียน</label>
-            <input type="text" id="email" class="form-control" placeholder="กรอกอีเมลหรือรหัสนักเรียน">
+            <input type="text" id="email" class="form-control" placeholder="เช่น 1001 หรือ teacher@school.com">
         </div>
         <div class="form-group">
             <label>รหัสผ่าน</label>
             <input type="password" id="password" class="form-control" placeholder="กรอกรหัสผ่าน">
         </div>
-        <p id="loginMessage" style="color:red; font-size:0.85rem; margin-bottom:1rem;"></p>
+        <p id="loginMessage" style="color:#e53e3e; font-size:0.85rem; margin-bottom:1rem;"></p>
         <button class="btn" onclick="login()">เข้าสู่ระบบ</button>
     </div>
 </div>
@@ -83,25 +90,26 @@
     <div class="layout">
         <!-- SIDEBAR -->
         <div class="sidebar">
-            <h2>E-LEARNING</h2>
+            <h2>E-LEARNING SYSTEM</h2>
             <div id="sidebarUser" class="sidebar-user">👨‍🎓 ผู้ใช้งาน</div>
             
             <!-- TEACHER MENU -->
             <ul id="teacherMenu" class="nav-menu" style="display:none;">
-                <li class="nav-item active" onclick="showSection('teacherDashboard')">📊 แผงควบคุม</li>
-                <li class="nav-item" onclick="showSection('studentManagement')">👨‍🎓 จัดการนักเรียน</li>
-                <li class="nav-item" onclick="showSection('videoRoom')">📹 ห้องเรียนออนไลน์</li>
+                <li class="nav-item active" onclick="showSection('teacherDashboard', this)">📊 แผงควบคุม</li>
+                <li class="nav-item" onclick="showSection('studentManagement', this)">👨‍🎓 จัดการนักเรียน</li>
+                <li class="nav-item" onclick="showSection('teacherAssignments', this)">📚 มอบหมายและตรวจงาน</li>
+                <li class="nav-item" onclick="showSection('teacherQuizzes', this)">✍️ จัดการแบบทดสอบ</li>
+                <li class="nav-item" onclick="showSection('videoRoom', this)">📹 ห้องเรียนออนไลน์</li>
             </ul>
 
             <!-- STUDENT MENU -->
             <ul id="studentMenu" class="nav-menu" style="display:none;">
-                <li class="nav-item active" onclick="showSection('studentDashboard')">🏠 หน้าแรกนักเรียน</li>
-                <li class="nav-item" onclick="showSection('studentAssignments')">📚 งานที่ได้รับมอบหมาย</li>
-                <li class="nav-item" onclick="showSection('studentQuizzes')">✍️ แบบทดสอบ / แนวข้อสอบ</li>
-                <li class="nav-item" onclick="showSection('videoRoom')">📹 ห้องเรียนออนไลน์</li>
+                <li class="nav-item active" onclick="showSection('studentDashboard', this)">🏠 หน้าแรกนักเรียน</li>
+                <li class="nav-item" onclick="showSection('studentAssignments', this)">📚 งานที่ได้รับมอบหมาย</li>
+                <li class="nav-item" onclick="showSection('studentQuizzes', this)">✍️ แบบทดสอบ / แนวข้อสอบ</li>
+                <li class="nav-item" onclick="showSection('videoRoom', this)">📹 ห้องเรียนออนไลน์</li>
             </ul>
 
-            <br>
             <button class="btn btn-secondary" onclick="logout()">ออกจากระบบ</button>
         </div>
 
@@ -111,39 +119,43 @@
             <!-- TEACHER DASHBOARD -->
             <div id="teacherDashboard" class="page-section active">
                 <h1 class="page-title">📊 แผงควบคุมสำหรับครู</h1>
-                <div class="grid-2">
+                <div class="grid-3">
                     <div class="card">
                         <h3>นักเรียนทั้งหมด</h3>
-                        <h1 id="teacherTotalStudents" style="font-size: 3rem; color:#4c51bf; margin-top:0.5rem;">0</h1>
+                        <h1 id="teacherTotalStudents" style="font-size: 2.5rem; color:#4c51bf; margin-top:0.5rem;">0</h1>
                     </div>
                     <div class="card">
-                        <h3>สถานะระบบ</h3>
-                        <p style="margin-top:1rem; color:green;">🟢 เชื่อมต่อพร้อมใช้งาน</p>
+                        <h3>งานที่มอบหมายแล้ว</h3>
+                        <h1 id="teacherTotalAssignments" style="font-size: 2.5rem; color:#38a169; margin-top:0.5rem;">0</h1>
+                    </div>
+                    <div class="card">
+                        <h3>งานรอการตรวจ</h3>
+                        <h1 id="teacherPendingGrading" style="font-size: 2.5rem; color:#dd6b20; margin-top:0.5rem;">0</h1>
                     </div>
                 </div>
             </div>
 
-            <!-- STUDENT MANAGEMENT -->
+            <!-- STUDENT MANAGEMENT (TEACHER) -->
             <div id="studentManagement" class="page-section">
                 <h1 class="page-title">👨‍🎓 จัดการข้อมูลนักเรียน</h1>
                 <div class="card">
                     <h3>เพิ่มนักเรียนใหม่</h3>
                     <br>
                     <div class="grid-2">
-                        <input type="text" id="student_id" class="form-control" placeholder="รหัสนักเรียน">
+                        <input type="text" id="student_id" class="form-control" placeholder="รหัสนักเรียน (เช่น 1001)">
                         <input type="text" id="fullname" class="form-control" placeholder="ชื่อ-นามสกุล">
                         <input type="email" id="student_email" class="form-control" placeholder="อีเมล">
                         <input type="text" id="classroom" class="form-control" placeholder="ห้องเรียน (เช่น ม.5/1)">
                         <input type="number" step="0.01" id="student_gpa" class="form-control" placeholder="เกรดเฉลี่ย (GPA)">
                     </div>
                     <br>
-                    <button class="btn" onclick="addStudent()">+ เพิ่มข้อมูลนักเรียน</button>
+                    <button class="btn btn-success" style="width: auto;" onclick="addStudent()">+ เพิ่มข้อมูลนักเรียน</button>
                 </div>
 
                 <div class="card">
-                    <h3>รายชื่อนักเรียน</h3>
+                    <h3>รายชื่อนักเรียนในระบบ</h3>
                     <br>
-                    <input type="text" id="studentSearch" class="form-control" placeholder="ค้นหาตามรหัส หรือ ชื่อ..." onkeyup="filterStudents()">
+                    <input type="text" id="studentSearch" class="form-control" placeholder="ค้นหาด้วยรหัส หรือ ชื่อ-นามสกุล..." onkeyup="filterStudents()">
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -165,6 +177,59 @@
                 </div>
             </div>
 
+            <!-- TEACHER ASSIGNMENTS & GRADING -->
+            <div id="teacherAssignments" class="page-section">
+                <h1 class="page-title">📚 จัดการสั่งงานและให้คะแนน</h1>
+                <div class="card">
+                    <h3>สั่งงาน / มอบหมายงานใหม่</h3>
+                    <br>
+                    <div class="grid-2">
+                        <input type="text" id="assignSubject" class="form-control" placeholder="ชื่อวิชา (เช่น คณิตศาสตร์)">
+                        <input type="text" id="assignTitle" class="form-control" placeholder="หัวข้องาน / การบ้าน">
+                        <input type="date" id="assignDueDate" class="form-control">
+                        <input type="text" id="assignDesc" class="form-control" placeholder="คำอธิบายรายละเอียดงาน">
+                    </div>
+                    <br>
+                    <button class="btn btn-success" style="width: auto;" onclick="createAssignment()">+ สร้างรายการงาน</button>
+                </div>
+
+                <div class="card">
+                    <h3>รายการงานที่นักเรียนส่งมา (รอตรวจคะแนน)</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>รหัสนักเรียน</th>
+                                    <th>งาน / วิชา</th>
+                                    <th>ลิงก์งาน</th>
+                                    <th>สถานะ</th>
+                                    <th>ให้คะแนน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherGradingTable">
+                                <tr><td colspan="5" class="empty">ไม่มีรายการงานที่รอตรวจ</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEACHER QUIZZES -->
+            <div id="teacherQuizzes" class="page-section">
+                <h1 class="page-title">✍️ จัดการแบบทดสอบ / แนวข้อสอบ</h1>
+                <div class="card">
+                    <h3>สร้างแนวข้อสอบใหม่</h3>
+                    <br>
+                    <div class="grid-2">
+                        <input type="text" id="quizSubject" class="form-control" placeholder="ชื่อวิชา">
+                        <input type="text" id="quizTitle" class="form-control" placeholder="ชื่อชุดข้อสอบ / หัวข้อ">
+                        <input type="text" id="quizLink" class="form-control" placeholder="ลิงก์ข้อสอบ (เช่น Google Forms / คลังข้อสอบ)">
+                    </div>
+                    <br>
+                    <button class="btn btn-success" style="width: auto;" onclick="createQuiz()">+ เพิ่มแนวข้อสอบ</button>
+                </div>
+            </div>
+
             <!-- STUDENT DASHBOARD -->
             <div id="studentDashboard" class="page-section">
                 <h1 class="page-title">🏠 หน้าแรกนักเรียน</h1>
@@ -172,7 +237,7 @@
                     <h3>ข้อมูลส่วนตัว</h3>
                     <br>
                     <div id="studentProfile" class="grid-2">
-                        <!-- Profile loaded dynamically -->
+                        <!-- Loaded dynamically -->
                     </div>
                 </div>
                 <div class="card">
@@ -189,4 +254,461 @@
                     <div class="table-wrapper">
                         <table>
                             <thead>
-                     
+                                <tr>
+                                    <th>วิชา</th>
+                                    <th>หัวข้องาน</th>
+                                    <th>กำหนดส่ง</th>
+                                    <th>รายละเอียด</th>
+                                    <th>ส่งงาน (วางลิงก์)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentAssignmentList">
+                                <tr><td colspan="5" class="empty">ไม่มีงานค้างส่ง</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>ประวัติการส่งงานและคะแนนของคุณ</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>วิชา / หัวข้องาน</th>
+                                    <th>ลิงก์งานที่ส่ง</th>
+                                    <th>คะแนนที่ได้</th>
+                                    <th>สถานะ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mySubmissionsList">
+                                <tr><td colspan="4" class="empty">ยังไม่มีประวัติการส่งงาน</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STUDENT QUIZZES -->
+            <div id="studentQuizzes" class="page-section">
+                <h1 class="page-title">✍️ แบบทดสอบ / แนวข้อสอบ</h1>
+                <div class="card">
+                    <h3>รายการแบบทดสอบที่เปิดให้ทำ</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>วิชา</th>
+                                    <th>ชุดข้อสอบ</th>
+                                    <th>เข้าทำข้อสอบ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentQuizList">
+                                <tr><td colspan="3" class="empty">ไม่มีแบบทดสอบในขณะนี้</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIDEO ROOM -->
+            <div id="videoRoom" class="page-section">
+                <h1 class="page-title">📹 ห้องเรียนออนไลน์ (Video Call)</h1>
+                <div class="card">
+                    <p><b>ID ของคุณ:</b> <span id="my-id" style="color:#4c51bf; font-weight:bold;">กำลังเชื่อมต่อระบบ...</span></p>
+                    <br>
+                    <div style="display:flex; gap:0.5rem; max-width:500px;">
+                        <input type="text" id="peer-id-input" class="form-control" placeholder="กรอก Peer ID ของคู่สนทนา">
+                        <button class="btn btn-success" style="width: auto;" onclick="makeCall()">📞 โทรออก</button>
+                    </div>
+                    <div class="video-container">
+                        <div>
+                            <p style="margin-bottom:0.3rem;"><b>กล้องของคุณ</b></p>
+                            <video id="local-video" autoplay muted></video>
+                        </div>
+                        <div>
+                            <p style="margin-bottom:0.3rem;"><b>กล้องคู่สนทนา</b></p>
+                            <video id="remote-video" autoplay></video>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button id="mic-btn" class="btn btn-secondary btn-sm" onclick="toggleMic()">🎤 เปิด/ปิดไมค์</button>
+                        <button id="cam-btn" class="btn btn-secondary btn-sm" onclick="toggleCam()">📷 เปิด/ปิดกล้อง</button>
+                        <button class="btn btn-danger btn-sm" onclick="endCall()">🛑 วางสาย</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// --- SUPABASE CONFIGURATION ---
+const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_ID.supabase.co";
+const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
+const supabase = (window.supabase && !SUPABASE_URL.includes("YOUR_SUPABASE")) 
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
+    : null;
+
+// Global State / Data Store
+let currentUser = null;
+let currentRole = null;
+let localStream = null;
+let peerCall = null;
+let peer = null;
+
+// Memory Databases (Fallback เมื่อไม่ได้ต่อ Supabase)
+let dbStudents = [
+    { student_id: "1001", fullname: "สมชาย สายเรียน", student_email: "somchai@email.com", classroom: "ม.5/1", student_gpa: "3.75" },
+    { student_id: "1002", fullname: "สมหญิง ขยันยิ่ง", student_email: "somying@email.com", classroom: "ม.5/1", student_gpa: "3.90" }
+];
+let dbAssignments = [
+    { id: 1, subject: "คณิตศาสตร์", title: "แบบฝึกหัดเรื่องเซต", dueDate: "2026-09-15", desc: "ทำแบบฝึกหัดหน้า 12-15" }
+];
+let dbSubmissions = [];
+let dbQuizzes = [
+    { id: 1, subject: "ภาษาอังกฤษ", title: "แนวข้อสอบ Mid-term", link: "https://google.com" }
+];
+
+// --- INITIALIZATION ---
+window.onload = function() {
+    initPeer();
+};
+
+// --- AUTHENTICATION ---
+async function login() {
+    const emailInput = document.getElementById('email').value.trim();
+    const roleInput = document.getElementById('role').value;
+    const msg = document.getElementById('loginMessage');
+
+    msg.innerText = "";
+    if (!emailInput) {
+        msg.innerText = "กรุณากรอกอีเมลหรือรหัสนักเรียน";
+        return;
+    }
+
+    currentRole = roleInput;
+
+    if (roleInput === 'teacher') {
+        currentUser = { email: emailInput, name: "คุณครูผู้สอน", role: "teacher" };
+        showSystemPage();
+    } else {
+        if (supabase) {
+            const { data, error } = await supabase.from('students').select('*').or(`student_id.eq.${emailInput},student_email.eq.${emailInput}`).single();
+            if (error || !data) {
+                msg.innerText = "ไม่พบข้อมูลนักเรียน รหัสหรืออีเมลไม่ถูกต้อง";
+                return;
+            }
+            currentUser = data;
+        } else {
+            const found = dbStudents.find(s => s.student_id === emailInput || s.student_email === emailInput);
+            currentUser = found || { student_id: emailInput, fullname: "นักเรียน ทดสอบ", classroom: "ม.5/1", student_gpa: "3.50", role: "student" };
+        }
+        showSystemPage();
+    }
+}
+
+function showSystemPage() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('systemPage').style.display = 'block';
+
+    if (currentRole === 'teacher') {
+        document.getElementById('teacherMenu').style.display = 'block';
+        document.getElementById('studentMenu').style.display = 'none';
+        document.getElementById('sidebarUser').innerText = `👨‍🏫 ${currentUser.name}`;
+        showSection('teacherDashboard', document.querySelector('#teacherMenu .nav-item'));
+        loadTeacherData();
+    } else {
+        document.getElementById('studentMenu').style.display = 'block';
+        document.getElementById('teacherMenu').style.display = 'none';
+        document.getElementById('sidebarUser').innerText = `👨‍🎓 ${currentUser.fullname || currentUser.student_id}`;
+        showSection('studentDashboard', document.querySelector('#studentMenu .nav-item'));
+        loadStudentData();
+    }
+}
+
+function logout() {
+    currentUser = null;
+    currentRole = null;
+    document.getElementById('systemPage').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('email').value = '';
+    document.getElementById('password').value = '';
+}
+
+function showSection(sectionId, element) {
+    const sections = document.querySelectorAll('.page-section');
+    sections.forEach(sec => sec.classList.remove('active'));
+
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
+
+    const target = document.getElementById(sectionId);
+    if (target) target.classList.add('active');
+    if (element) element.classList.add('active');
+}
+
+// --- TEACHER FUNCTIONS ---
+function loadTeacherData() {
+    renderStudentTable(dbStudents);
+    renderTeacherGrading();
+    document.getElementById('teacherTotalStudents').innerText = dbStudents.length;
+    document.getElementById('teacherTotalAssignments').innerText = dbAssignments.length;
+    document.getElementById('teacherPendingGrading').innerText = dbSubmissions.filter(s => s.score === 'รอตรวจ').length;
+}
+
+function renderStudentTable(students) {
+    const tbody = document.getElementById('studentTable');
+    if (!tbody) return;
+    if (students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">ไม่มีข้อมูลนักเรียน</td></tr>';
+        return;
+    }
+    tbody.innerHTML = students.map((s, idx) => `
+        <tr>
+            <td>${idx + 1}</td>
+            <td><b>${s.student_id}</b></td>
+            <td>${s.fullname}</td>
+            <td>${s.student_email || '-'}</td>
+            <td>${s.classroom || '-'}</td>
+            <td>${s.student_gpa || '0.00'}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.student_id}')">🗑️ ลบ</button></td>
+        </tr>
+    `).join('');
+}
+
+function addStudent() {
+    const id = document.getElementById('student_id').value.trim();
+    const name = document.getElementById('fullname').value.trim();
+    const email = document.getElementById('student_email').value.trim();
+    const cls = document.getElementById('classroom').value.trim();
+    const gpa = document.getElementById('student_gpa').value || "0.00";
+
+    if (!id || !name) return alert("กรุณากรอกรหัสและชื่อนักเรียน");
+
+    dbStudents.push({ student_id: id, fullname: name, student_email: email, classroom: cls, student_gpa: gpa });
+    alert("เพิ่มนักเรียนเรียบร้อยแล้ว");
+    loadTeacherData();
+}
+
+function deleteStudent(id) {
+    if (!confirm("ยืนยันการลบนักเรียนรหัส " + id + "?")) return;
+    dbStudents = dbStudents.filter(s => s.student_id !== id);
+    loadTeacherData();
+}
+
+function filterStudents() {
+    const q = document.getElementById('studentSearch').value.toLowerCase();
+    const filtered = dbStudents.filter(s => s.student_id.toLowerCase().includes(q) || s.fullname.toLowerCase().includes(q));
+    renderStudentTable(filtered);
+}
+
+function createAssignment() {
+    const subject = document.getElementById('assignSubject').value.trim();
+    const title = document.getElementById('assignTitle').value.trim();
+    const dueDate = document.getElementById('assignDueDate').value;
+    const desc = document.getElementById('assignDesc').value.trim();
+
+    if (!subject || !title) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+
+    dbAssignments.push({ id: Date.now(), subject, title, dueDate, desc });
+    alert("สั่งงานเรียบร้อยแล้ว!");
+    loadTeacherData();
+}
+
+function renderTeacherGrading() {
+    const tbody = document.getElementById('teacherGradingTable');
+    if (!tbody) return;
+    if (dbSubmissions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">ไม่มีงานที่ส่งเข้ามา</td></tr>';
+        return;
+    }
+    tbody.innerHTML = dbSubmissions.map(sub => `
+        <tr>
+            <td><b>${sub.student_id}</b></td>
+            <td>${sub.assignmentTitle}</td>
+            <td><a href="${sub.link}" target="_blank" style="color:#4c51bf;">เปิดลิงก์งาน</a></td>
+            <td><span class="badge ${sub.score === 'รอตรวจ' ? 'badge-pending' : 'badge-graded'}">${sub.score}</span></td>
+            <td>
+                <input type="text" id="score-${sub.id}" placeholder="คะแนน" style="width:70px; padding:0.2rem;" value="${sub.score !== 'รอตรวจ' ? sub.score : ''}">
+                <button class="btn btn-success btn-sm" onclick="gradeSubmission(${sub.id})">บันทึก</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function gradeSubmission(subId) {
+    const val = document.getElementById(`score-${subId}`).value.trim();
+    const sub = dbSubmissions.find(s => s.id === subId);
+    if (sub && val) {
+        sub.score = val;
+        alert("ให้คะแนนสำเร็จแล้ว!");
+        loadTeacherData();
+    }
+}
+
+function createQuiz() {
+    const subject = document.getElementById('quizSubject').value.trim();
+    const title = document.getElementById('quizTitle').value.trim();
+    const link = document.getElementById('quizLink').value.trim();
+
+    if (!subject || !title || !link) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+
+    dbQuizzes.push({ id: Date.now(), subject, title, link });
+    alert("เพิ่มแนวข้อสอบเรียบร้อย!");
+}
+
+// --- STUDENT FUNCTIONS ---
+function loadStudentData() {
+    const profile = document.getElementById('studentProfile');
+    if (profile && currentUser) {
+        profile.innerHTML = `
+            <div><small style="color:#718096;">ชื่อ-นามสกุล</small><br><strong>${currentUser.fullname}</strong></div>
+            <div><small style="color:#718096;">รหัสนักเรียน</small><br><strong>${currentUser.student_id}</strong></div>
+            <div><small style="color:#718096;">ห้องเรียน</small><br><strong>${currentUser.classroom || 'ม.5/1'}</strong></div>
+        `;
+        document.getElementById('myGPA').innerText = currentUser.student_gpa || '0.00';
+    }
+    renderStudentAssignments();
+    renderStudentSubmissions();
+    renderStudentQuizzes();
+}
+
+function renderStudentAssignments() {
+    const tbody = document.getElementById('studentAssignmentList');
+    if (!tbody) return;
+    if (dbAssignments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">ไม่มีงานค้างส่ง</td></tr>';
+        return;
+    }
+    tbody.innerHTML = dbAssignments.map(a => `
+        <tr>
+            <td><b>${a.subject}</b></td>
+            <td>${a.title}</td>
+            <td>${a.dueDate || '-'}</td>
+            <td>${a.desc || '-'}</td>
+            <td>
+                <input type="text" id="sub-link-${a.id}" placeholder="วาง URL ลิงก์งาน" style="padding:0.3rem; font-size:0.85rem; width:150px;">
+                <button class="btn btn-sm" onclick="submitWork(${a.id}, '${a.title}')">ส่งงาน</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function submitWork(assignId, title) {
+    const linkInput = document.getElementById(`sub-link-${assignId}`).value.trim();
+    if (!linkInput) return alert("กรุณากรอกลิงก์งานของคุณก่อนกดส่ง");
+
+    dbSubmissions.push({
+        id: Date.now(),
+        student_id: currentUser.student_id,
+        assignmentTitle: title,
+        link: linkInput,
+        score: "รอตรวจ"
+    });
+
+    alert("ส่งงานสำเร็จแล้ว!");
+    renderStudentSubmissions();
+}
+
+function renderStudentSubmissions() {
+    const tbody = document.getElementById('mySubmissionsList');
+    if (!tbody) return;
+    const mySubs = dbSubmissions.filter(s => s.student_id === currentUser.student_id);
+    if (mySubs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">ยังไม่มีประวัติการส่งงาน</td></tr>';
+        return;
+    }
+    tbody.innerHTML = mySubs.map(s => `
+        <tr>
+            <td>${s.assignmentTitle}</td>
+            <td><a href="${s.link}" target="_blank" style="color:#4c51bf;">ดูงานที่ส่ง</a></td>
+            <td><b>${s.score}</b></td>
+            <td><span class="badge ${s.score === 'รอตรวจ' ? 'badge-pending' : 'badge-graded'}">${s.score === 'รอตรวจ' ? 'รอตรวจ' : 'ตรวจแล้ว'}</span></td>
+        </tr>
+    `).join('');
+}
+
+function renderStudentQuizzes() {
+    const tbody = document.getElementById('studentQuizList');
+    if (!tbody) return;
+    if (dbQuizzes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="empty">ไม่มีแบบทดสอบ</td></tr>';
+        return;
+    }
+    tbody.innerHTML = dbQuizzes.map(q => `
+        <tr>
+            <td><b>${q.subject}</b></td>
+            <td>${q.title}</td>
+            <td><a href="${q.link}" target="_blank" class="btn btn-sm" style="text-decoration:none; display:inline-block;">📝 เข้าทำแบบทดสอบ</a></td>
+        </tr>
+    `).join('');
+}
+
+// --- VIDEO CALL (PEERJS) ---
+function initPeer() {
+    if (typeof Peer === 'undefined') return;
+    peer = new Peer();
+
+    peer.on('open', id => {
+        const myIdEl = document.getElementById('my-id');
+        if (myIdEl) myIdEl.innerText = id;
+    });
+
+    peer.on('call', call => {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+            localStream = stream;
+            document.getElementById('local-video').srcObject = stream;
+            call.answer(stream);
+            peerCall = call;
+            call.on('stream', remoteStream => {
+                document.getElementById('remote-video').srcObject = remoteStream;
+            });
+        }).catch(err => alert("ไม่สามารถเปิดกล้อง/ไมค์ได้"));
+    });
+}
+
+function makeCall() {
+    const remoteId = document.getElementById('peer-id-input').value.trim();
+    if (!remoteId) return alert("กรุณากรอก Peer ID คู่สนทนา");
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+        localStream = stream;
+        document.getElementById('local-video').srcObject = stream;
+        const call = peer.call(remoteId, stream);
+        peerCall = call;
+        call.on('stream', remoteStream => {
+            document.getElementById('remote-video').srcObject = remoteStream;
+        });
+    }).catch(err => alert("ไม่สามารถเปิดกล้อง/ไมค์ได้"));
+}
+
+function toggleMic() {
+    if (localStream) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack) {
+            audioTrack.enabled = !audioTrack.enabled;
+            alert(audioTrack.enabled ? "เปิดไมค์แล้ว" : "ปิดไมค์แล้ว");
+        }
+    }
+}
+
+function toggleCam() {
+    if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+            videoTrack.enabled = !videoTrack.enabled;
+            alert(videoTrack.enabled ? "เปิดกล้องแล้ว" : "ปิดกล้องแล้ว");
+        }
+    }
+}
+
+function endCall() {
+    if (peerCall) peerCall.close();
+    if (localStream) localStream.getTracks().forEach(track => track.stop());
+    document.getElementById('local-video').srcObject = null;
+    document.getElementById('remote-video').srcObject = null;
+}
+</script>
+</body>
+</html>
