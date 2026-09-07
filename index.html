@@ -1,1 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextGen Learning Hub</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 300px;
+            background-color: #ffffff;
+            border-right: 1px solid #e4e6eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: #1a73e8;
+            color: white;
+        }
+
+        .progress-container {
+            margin-top: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #00e676;
+            width: 35%;
+            transition: width 0.3s ease;
+        }
+
+        .module-list {
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .module-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f2f5;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .module-item:hover, .module-item.active {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: #e4e6eb;
+        }
+
+        .status-badge.completed {
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Video Section */
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        /* Quiz Interactive Section */
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: white;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quiz-option:hover {
+            background-color: #f8f9fa;
+            border-color: #1a73e8;
+        }
+
+        .btn-submit {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #1557b0;
+        }
+
+        /* Interactive Notes */
+        .notes-input {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            resize: none;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Advanced Web Dev</h2>
+            <p style="font-size: 13px; margin-top: 5px;">ความคืบหน้าการเรียน: <span id="progress-text">35%</span></p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+        <ul class="module-list">
+            <li class="module-item active" onclick="loadModule(1)">
+                <span>1. Introduction & Setup</span>
+                <span class="status-badge completed">เสร็จแล้ว</span>
+            </li>
+            <li class="module-item" onclick="loadModule(2)">
+                <span>2. Interactive DOM Mechanics</span>
+                <span class="status-badge">กำลังเรียน</span>
+            </li>
+            <li class="module-item" onclick="loadModule(3)">
+                <span>3. State Management</span>
+                <span class="status-badge">รอดำเนินการ</span>
+            </li>
+            <li class="module-item" onclick="loadModule(4)">
+                <span>4. API Integration & Quiz</span>
+                <span class="status-badge">รอดำเนินการ</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="card">
+            <h2 id="lesson-title" style="margin-bottom: 15px;">บทที่ 2: Interactive DOM Mechanics</h2>
+            <div class="video-container">
+                <video id="main-video" controls>
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
+                </video>
+            </div>
+        </div>
+
+        <div class="card" id="quiz-card">
+            <h3>📝 คำถามวัดความเข้าใจแบบเรียลไทม์</h3>
+            <p style="margin: 10px 0; color: #5f6368;">ฟังก์ชันใดใน JavaScript ที่ใช้สำหรับดึง Element ผ่าน ID?</p>
+            
+            <button class="quiz-option" onclick="selectAnswer(this, false)">A. document.querySelector('.element')</button>
+            <button class="quiz-option" onclick="selectAnswer(this, true)">B. document.getElementById('element')</button>
+            <button class="quiz-option" onclick="selectAnswer(this, false)">C. document.getElementByClassName('element')</button>
+            
+            <button class="btn-submit" onclick="submitQuiz()">ส่งคำตอบ</button>
+            <p id="quiz-result" style="margin-top: 10px; font-weight: bold;"></p>
+        </div>
+
+        <div class="card">
+            <h3>📌 สมุดบันทึกส่วนตัวประจำบทเรียน</h3>
+            <p style="font-size: 12px; color: #5f6368; margin-bottom: 8px;">โน้ตของคุณจะถูกบันทึกไว้ในระบบโดยอัตโนมัติ</p>
+            <textarea class="notes-input" id="user-notes" placeholder="พิมพ์บันทึกความเข้าใจของคุณที่นี่..."></textarea>
+            <button class="btn-submit" onclick="saveNotes()">บันทึกโน้ต</button>
+            <span id="save-status" style="font-size: 12px; color: #137333; margin-left: 10px;"></span>
+        </div>
+
+    </div>
+
+    <script>
+        let selectedQuizOption = null;
+        let isCorrectAnswer = false;
+
+        function selectAnswer(element, isCorrect) {
+            // Reset background for options
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.style.backgroundColor = 'white');
+            
+            // Highlight selected
+            element.style.backgroundColor = '#e8f0fe';
+            selectedQuizOption = element;
+            isCorrectAnswer = isCorrect;
+        }
+
+        function submitQuiz() {
+            const resultText = document.getElementById('quiz-result');
+            if (!selectedQuizOption) {
+                resultText.style.color = '#d93025';
+                resultText.innerText = 'กรุณาเลือกคำตอบก่อนส่ง';
+                return;
+            }
+
+            if (isCorrectAnswer) {
+                resultText.style.color = '#137333';
+                resultText.innerText = '✨ ถูกต้อง! ระบบอัปเดตความคืบหน้าการเรียนให้แล้ว';
+                updateProgress(65);
+            } else {
+                resultText.style.color = '#d93025';
+                resultText.innerText = '❌ ยังไม่ถูกต้อง ลองใหม่อีกครั้ง';
+            }
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-text').innerText = percent + '%';
+        }
+
+        function saveNotes() {
+            const notes = document.getElementById('user-notes').value;
+            if (notes.trim() !== '') {
+                document.getElementById('save-status').innerText = 'บันทึกเรียบร้อยแล้ว!';
+                setTimeout(() => {
+                    document.getElementById('save-status').innerText = '';
+                }, 3000);
+            }
+        }
+
+        function loadModule(moduleNumber) {
+            const title = document.getElementById('lesson-title');
+            if (moduleNumber === 1) title.innerText = 'บทที่ 1: Introduction & Setup';
+            if (moduleNumber === 2) title.innerText = 'บทที่ 2: Interactive DOM Mechanics';
+            if (moduleNumber === 3) title.innerText = 'บทที่ 3: State Management';
+            if (moduleNumber === 4) title.innerText = 'บทที่ 4: API Integration & Quiz';
+        }
+    </script>
+</body>
+</html>
 
